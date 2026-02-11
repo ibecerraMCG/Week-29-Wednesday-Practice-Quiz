@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 29 Wednesday Practice Quiz</title>
+    <style>
+        /* --- CSS Variables & Themes --- */
+        :root {
+            /* Base Transition */
+            --transition-speed: 0.3s;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 1. Modern Dark (Default) */
+        [data-theme="dark"] {
+            --bg-body: #1e293b;
+            --bg-card: #334155;
+            --bg-header: #0f172a;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-accent: #38bdf8;
+            --border-color: #475569;
+            --highlight-bg: #475569;
+            --button-bg: #38bdf8;
+            --button-text: #0f172a;
+            --button-hover: #0ea5e9;
+            --feedback-success-bg: #064e3b;
+            --feedback-success-border: #059669;
+            --feedback-success-text: #a7f3d0;
+            --feedback-error-bg: #7f1d1d;
+            --feedback-error-border: #dc2626;
+            --feedback-error-text: #fecaca;
+        }
+
+        /* 2. Modern Light */
+        [data-theme="light"] {
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-header: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --text-accent: #2563eb;
+            --border-color: #e5e7eb;
+            --highlight-bg: #f3f4f6;
+            --button-bg: #2563eb;
+            --button-text: #ffffff;
+            --button-hover: #1d4ed8;
+            --feedback-success-bg: #ecfdf5;
+            --feedback-success-border: #34d399;
+            --feedback-success-text: #065f46;
+            --feedback-error-bg: #fef2f2;
+            --feedback-error-border: #f87171;
+            --feedback-error-text: #991b1b;
+        }
+
+        /* 3. Midnight (Pure Black) */
+        [data-theme="midnight"] {
+            --bg-body: #000000;
+            --bg-card: #000000;
+            --bg-header: #000000;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --text-accent: #90caf9;
+            --border-color: #333333;
+            --highlight-bg: #1a1a1a;
+            --button-bg: #90caf9;
+            --button-text: #000000;
+            --button-hover: #42a5f5;
+            --feedback-success-bg: #051b11;
+            --feedback-success-border: #0f5132;
+            --feedback-success-text: #75b798;
+            --feedback-error-bg: #2c0b0e;
+            --feedback-error-border: #842029;
+            --feedback-error-text: #ea868f;
+        }
+
+        /* 4. Legacy Dark (Original) */
+        [data-theme="legacy-dark"] {
+            --bg-body: #2d343e;
+            --bg-card: #3c424f;
+            --bg-header: #3c424f;
+            --text-main: #e8e6e3;
+            --text-muted: #b0c4de;
+            --text-accent: #8ab4f8;
+            --border-color: #555;
+            --highlight-bg: #454c5a;
+            --button-bg: #8ab4f8;
+            --button-text: #202124;
+            --button-hover: #a3c5f9;
+            --feedback-success-bg: #344e41;
+            --feedback-success-border: #52b788;
+            --feedback-success-text: #c7f9cc;
+            --feedback-error-bg: #5e2129;
+            --feedback-error-border: #a4133c;
+            --feedback-error-text: #f8d7da;
+        }
+
+        /* 5. Sepia (Reading Mode) */
+        [data-theme="sepia"] {
+            --bg-body: #f4ecd8;
+            --bg-card: #fdf6e3;
+            --bg-header: #e4d5b7;
+            --text-main: #433422;
+            --text-muted: #7c6f5a;
+            --text-accent: #a05a2c;
+            --border-color: #d3c4a5;
+            --highlight-bg: #ebe1c9;
+            --button-bg: #a05a2c;
+            --button-text: #fdf6e3;
+            --button-hover: #864822;
+            --feedback-success-bg: #e6f4ea;
+            --feedback-success-border: #8ab893;
+            --feedback-success-text: #2e4c35;
+            --feedback-error-bg: #f9e3e3;
+            --feedback-error-border: #d48f8f;
+            --feedback-error-text: #5c2b2b;
+        }
+
+        /* 6. High Contrast */
+        [data-theme="contrast"] {
+            --bg-body: #000000;
+            --bg-card: #000000;
+            --bg-header: #000000;
+            --text-main: #ffffff;
+            --text-muted: #dddddd;
+            --text-accent: #ffff00;
+            --border-color: #ffffff;
+            --highlight-bg: #333333;
+            --button-bg: #ffff00;
+            --button-text: #000000;
+            --button-hover: #e6e600;
+            --feedback-success-bg: #000000;
+            --feedback-success-border: #00ff00;
+            --feedback-success-text: #00ff00;
+            --feedback-error-bg: #000000;
+            --feedback-error-border: #ff0000;
+            --feedback-error-text: #ff0000;
+        }
+
+        /* --- Global Reset & Layout --- */
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            line-height: 1.6;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Default to Sticky */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Class to remove sticky behavior */
+        header.unpinned {
+            position: relative;
+            box-shadow: none;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--text-accent);
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pin-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .pin-btn:hover {
+            background-color: var(--highlight-bg);
+        }
+
+        .pin-btn.pin-active {
+            color: var(--text-accent);
+            border-color: var(--text-accent);
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        select#theme-select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* --- Main Content --- */
+        .container {
+            max-width: 850px;
+            margin: 2rem auto;
+            padding: 0 1rem 4rem 1rem;
+        }
+
+        .section-header {
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--text-accent);
+            color: var(--text-accent);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* --- Question Card --- */
+        .question-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .lo-box {
+            background-color: var(--highlight-bg);
+            border-left: 4px solid var(--text-accent);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Options --- */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: var(--highlight-bg);
+            border-color: var(--text-muted);
+        }
+
+        .option-label input {
+            margin-top: 0.3rem;
+            margin-right: 1rem;
+            accent-color: var(--text-accent);
+            transform: scale(1.2);
+        }
+
+        /* --- Buttons --- */
+        .btn-check {
+            margin-top: 1.5rem;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-check:hover {
+            opacity: 0.9;
+        }
+
+        /* --- Feedback Area --- */
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+            border: 1px solid transparent;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            background-color: var(--feedback-success-bg);
+            border-color: var(--feedback-success-border);
+            color: var(--feedback-success-text);
+        }
+
+        .feedback.incorrect {
+            background-color: var(--feedback-error-bg);
+            border-color: var(--feedback-error-border);
+            color: var(--feedback-error-text);
+        }
+
+        .feedback-header {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .rationale {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .source {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-style: italic;
+            border-top: 1px dashed currentColor;
+            padding-top: 0.5rem;
+        }
+
+        /* --- Mobile Tweaks --- */
+        @media (max-width: 600px) {
+            header { padding: 1rem; flex-direction: column; gap: 10px; align-items: flex-start; }
+            .controls-wrapper { width: 100%; justify-content: space-between; }
+            .question-card { padding: 1.5rem; }
+            header h1 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <h1>Week 29 Wednesday Practice Quiz</h1>
+        <div class="controls-wrapper">
+            <!-- Pin Button -->
+            <button class="pin-btn pin-active" id="pin-btn" onclick="toggleHeader()" title="Pin/Unpin Header">
+                📍
+            </button>
+            
+            <div class="theme-control">
+                <label for="theme-select">Theme:</label>
+                <select id="theme-select" onchange="changeTheme(this.value)">
+                    <option value="dark">Modern Dark</option>
+                    <option value="midnight">Midnight</option>
+                    <option value="light">Modern Light</option>
+                    <option value="legacy-dark">Legacy Dark</option>
+                    <option value="sepia">Sepia</option>
+                    <option value="contrast">High Contrast</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" id="quiz-root">
+        <!-- Content injected via JS -->
+    </div>
+
+    <script>
+        // --- Data ---
+        const quizData = [
+            // --- Section 1: Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain ---
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO1: Define and classify [specific cardiovascular condition].",
+                fullLO: "LO1: Define and classify acute coronary syndromes",
+                question: "A 60-year-old male presents to the emergency department with chest pain. The attending physician explains that the patient's condition falls under the spectrum of Acute Coronary Syndromes (ACS). Which of the following pathophysiological mechanisms is the primary trigger for this spectrum of disease?",
+                options: {
+                    A: "Gradual narrowing of the coronary artery by stable plaque",
+                    B: "Disruption of coronary arterial plaque with subsequent thrombus formation",
+                    C: "Inflammation of the pericardium",
+                    D: "Spasm of the coronary arteries due to cold exposure",
+                    E: "Valvular stenosis leading to reduced cardiac output"
+                },
+                correctAnswer: "B",
+                rationale: "ACS is defined as the clinical manifestations of disruption of coronary arterial plaque complicated by intraluminal thrombosis and distal embolization.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 43: \"Acute coronary syndrome (ACS)... Clinical manifestations of disruption of coronary arterial plaque complicated by intraluminal thrombosis and distal embolization\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO1: Define and classify [specific cardiovascular condition].",
+                fullLO: "LO1: Define and classify acute coronary syndromes",
+                question: "A 55-year-old female presents with chest pain at rest. Diagnostic evaluation reveals an acute coronary syndrome. Which of the following clinical diagnoses is considered a subtype of ACS?",
+                options: {
+                    A: "Chronic stable angina",
+                    B: "Non-ST-elevation myocardial infarction (NSTEMI)",
+                    C: "Pericarditis",
+                    D: "Stable ischemic heart disease",
+                    E: "Variant (Prinzmetal's) angina"
+                },
+                correctAnswer: "B",
+                rationale: "The definition of ACS encompasses Acute ST-segment elevation myocardial infarction, Non-ST-segment elevation myocardial infarction, and Unstable angina.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 31: \"Definition: ACS... Encompasses... Non-ST-segment elevation myocardial infarction\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO2: Differentiate the subtypes on basis of history, troponin results, and [ECG findings].",
+                fullLO: "LO2: Differentiate the subtypes on basis of history, troponin results, and ECG findings",
+                question: "A 65-year-old male presents with substernal chest pain. An electrocardiogram (ECG) reveals ST-segment elevation in leads V1-V4. Cardiac biomarkers are pending. Based on the ECG findings, what is the most likely diagnosis?",
+                options: {
+                    A: "Non-ST-elevation myocardial infarction (NSTEMI)",
+                    B: "Stable Angina",
+                    C: "ST-elevation myocardial infarction (STEMI)",
+                    D: "Unstable Angina",
+                    E: "Variant Angina"
+                },
+                correctAnswer: "C",
+                rationale: "STEMI is characterized by transmural ischemia and is identified by ST elevation on the ECG.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 36: \"Acute Coronary Syndrome... ST elevation (STEMI)-transmural\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO2: Differentiate the subtypes on basis of history, troponin results, and [ECG findings].",
+                fullLO: "LO2: Differentiate the subtypes on basis of history, troponin results, and ECG findings",
+                question: "A 58-year-old female presents with new-onset chest pain occurring at rest. Her ECG shows no ST-segment elevation. Serial cardiac troponin levels are negative. Which of the following is the correct diagnosis?",
+                options: {
+                    A: "Non-cardiac chest pain",
+                    B: "Non-ST-elevation myocardial infarction (NSTEMI)",
+                    C: "Stable Angina",
+                    D: "ST-elevation myocardial infarction (STEMI)",
+                    E: "Unstable Angina"
+                },
+                correctAnswer: "E",
+                rationale: "Unstable angina presents with symptoms (often at rest or new onset) but with no elevation of cardiac enzymes.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 36: \"Unstable Angina-Symptoms but no elevation of cardiac enzymes\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO3: Summarize and rationalize the common elements of treatments for all [ACS types].",
+                fullLO: "LO3: Summarize and rationalize the common elements of treatments for all acute coronary syndromes",
+                question: "A patient is diagnosed with an Acute Coronary Syndrome. To prevent further thrombus propagation, the treatment protocol includes dual antiplatelet therapy. This typically consists of aspirin and:",
+                options: {
+                    A: "A beta-blocker",
+                    B: "A second antiplatelet agent",
+                    C: "Unfractionated heparin",
+                    D: "Vitamin K antagonist",
+                    E: "Warfarin"
+                },
+                correctAnswer: "B",
+                rationale: "Improved outcomes in ACS are associated with antiplatelet therapy using aspirin and a 2nd antiplatelet agent.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 44: \"Outcomes improved... Antiplatelet (aspirin and a 2nd antiplatelet agent)\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO3: Summarize and rationalize the common elements of treatments for all [ACS types].",
+                fullLO: "LO3: Summarize and rationalize the common elements of treatments for all acute coronary syndromes",
+                question: "A 62-year-old male with an NSTEMI is admitted to the hospital. In addition to antithrombotic therapy, the physician initiates a medication specifically to reduce myocardial ischemia by decreasing heart rate and contractility. Which agent was likely prescribed?",
+                options: {
+                    A: "Aspirin",
+                    B: "Beta-blocker",
+                    C: "Clopidogrel",
+                    D: "Heparin",
+                    E: "Statin"
+                },
+                correctAnswer: "B",
+                rationale: "Management of ACS includes reducing ischemia using beta blockers and nitrates.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 44: \"Reduce ischemia... Beta blockers\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO4: Define reperfusion and recognize those patients who warrant reperfusion therapy and by what technique",
+                fullLO: "LO4: Define reperfusion and recognize those patients who warrant reperfusion therapy and by what technique",
+                question: "A 50-year-old male presents to the emergency department with chest pain and ST-segment elevation on ECG. The hospital has a cardiac catheterization lab. What is the preferred reperfusion strategy for this patient?",
+                options: {
+                    A: "Coronary artery bypass grafting (CABG)",
+                    B: "Emergency primary percutaneous coronary intervention (PCI)",
+                    C: "Intravenous heparin only",
+                    D: "Medical management with antiplatelets only",
+                    E: "Thrombolysis"
+                },
+                correctAnswer: "B",
+                rationale: "For STEMI, emergency primary percutaneous coronary intervention (PCI) is preferred.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 43: \"For STEMI... Emergency primary percutaneous coronary intervention (PCI) preferred\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO4: Define reperfusion and recognize those patients who warrant reperfusion therapy and by what technique",
+                fullLO: "LO4: Define reperfusion and recognize those patients who warrant reperfusion therapy and by what technique",
+                question: "A patient presents with a STEMI to a rural hospital that does not have percutaneous coronary intervention (PCI) capabilities. Transfer to a PCI center would take 3 hours. Which of the following therapies should be administered to improve survival and outcome?",
+                options: {
+                    A: "Beta-blockers only",
+                    B: "Intravenous fluids",
+                    C: "Long-acting nitrates",
+                    D: "Thrombolysis",
+                    E: "Vitamin K"
+                },
+                correctAnswer: "D",
+                rationale: "When PCI is unavailable for a STEMI patient, thrombolysis substantially improves survival and outcome.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 43: \"When unavailable [PCI], thrombolysis substantially improves survival and outcome\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO5: Asses a patient for imminently life-threatening causes of [symptom].",
+                fullLO: "LO5: Asses a patient for imminently life-threatening causes of chest pain",
+                question: "A 68-year-old male convalescing from hip replacement surgery suddenly develops shortness of breath and lightheadedness. His oxygen saturation is 82% on room air, and he is tachycardic. Which of the following imminently life-threatening conditions is the most likely cause?",
+                options: {
+                    A: "Acute pericarditis",
+                    B: "Aortic dissection",
+                    C: "Costochondritis",
+                    D: "Pneumonia",
+                    E: "Pulmonary Embolus"
+                },
+                correctAnswer: "E",
+                rationale: "This clinical vignette (post-op hip replacement, sudden dyspnea, hypoxia, tachycardia) is classic for a pulmonary embolus, which is an imminently life-threatening cause of chest pain.",
+                source: "Chest_Pain_and_ACS.pdf, Slides 25 & 26: \"68-year-old man... home convalescing from hip replacement... feels short of breath... EMS finds him tachypneic and tachycardic... Pulmonary Embolus\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO5: Asses a patient for imminently life-threatening causes of [symptom].",
+                fullLO: "LO5: Asses a patient for imminently life-threatening causes of chest pain",
+                question: "A 58-year-old male with a history of hypertension presents with the abrupt onset of \"tearing\" pain between the shoulder blades. His blood pressure is 190/110 mmHg. This presentation is most concerning for:",
+                options: {
+                    A: "Acute myocardial infarction",
+                    B: "Aortic Dissection",
+                    C: "Esophageal rupture",
+                    D: "Pneumothorax",
+                    E: "Pulmonary embolus"
+                },
+                correctAnswer: "B",
+                rationale: "Abrupt tearing pain radiating to the back with hypertension is the classic presentation for aortic dissection, an imminently life-threatening cause of chest pain.",
+                source: "Chest_Pain_and_ACS.pdf, Slides 18 & 19: \"58-year-old man... abrupt onset of 'tearing' pain between shoulder blades... BP 190/110... Acute Aortic Dissection\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO6: Differentiate the three most serious causes of chest pain on basis of physical exam and appropriate testing",
+                fullLO: "LO6: Differentiate the three most serious causes of chest pain on basis of physical exam and appropriate testing",
+                question: "A patient presents with severe chest pain radiating to the back. Physical exam reveals a pulse deficit in the left radial artery. Which diagnostic test should be ordered to confirm the suspected diagnosis?",
+                options: {
+                    A: "Chest X-ray only",
+                    B: "Contrast CT scan",
+                    C: "Exercise stress test",
+                    D: "Troponin levels",
+                    E: "Ventilation-Perfusion scan"
+                },
+                correctAnswer: "B",
+                rationale: "The suspected diagnosis is aortic dissection (pulse deficit). If suspected, it should be excluded by imaging such as Contrast CT, Trans-esophageal echo, or Aortography.",
+                source: "Chest_Pain_and_ACS.pdf, Slides 22 & 23: \"Aortic Dissection... May be pulse deficit... If suspected, should be excluded by... Contrast CT\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO6: Differentiate the three most serious causes of chest pain on basis of physical exam and appropriate testing",
+                fullLO: "LO6: Differentiate the three most serious causes of chest pain on basis of physical exam and appropriate testing",
+                question: "A patient presents with pleuritic chest pain and dyspnea. Tachycardia is noted on exam. To rule out a pulmonary embolus, which of the following is an appropriate diagnostic imaging modality?",
+                options: {
+                    A: "Coronary Angiogram",
+                    B: "Echocardiogram",
+                    C: "Upper endoscopy",
+                    D: "Ventilation-Perfusion (V/Q) lung scan",
+                    E: "X-ray of the spine"
+                },
+                correctAnswer: "D",
+                rationale: "Pulmonary embolus is diagnosed with tests such as a Ventilation-Perfusion lung scan, Contrast CT, or Pulmonary arteriogram.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 27: \"Pulmonary Embolus... Make diagnosis with: Ventilation-Perfusion lung scan\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO7: Recognize low risk patient and select appropriate management strategy",
+                fullLO: "LO7: Recognize low risk patient and select appropriate management strategy",
+                question: "A 25-year-old male presents with sharp chest pain that is reproducible with palpation of the chest wall. His vital signs are stable, and he has no significant medical history. This presentation is most consistent with which non-life-threatening cause of chest pain?",
+                options: {
+                    A: "Aortic stenosis",
+                    B: "Musculoskeletal pain",
+                    C: "Pericarditis",
+                    D: "Pneumonia",
+                    E: "Pulmonary embolism"
+                },
+                correctAnswer: "B",
+                rationale: "Musculoskeletal causes are listed under non-life-threatening causes of chest pain. Reproducible pain is a hallmark of musculoskeletal origin (implied by exclusion of visceral causes and \"non-life threatening\" categorization).",
+                source: "Chest_Pain_and_ACS.pdf, Slide 6: \"Non-life threatening: ... Musculoskeletal\""
+            },
+            {
+                section: "Acute Coronary Syndrome/ Management of Non-Coronary Chest Pain",
+                maskedLO: "LO7: Recognize low risk patient and select appropriate management strategy",
+                fullLO: "LO7: Recognize low risk patient and select appropriate management strategy",
+                question: "A patient presents with burning chest pain that worsens after meals. An ECG is normal. Which of the following is a common non-life-threatening cause of chest pain that fits this description?",
+                options: {
+                    A: "Aortic dissection",
+                    B: "Cholelithiasis",
+                    C: "GERD/Acid reflux",
+                    D: "Myocarditis",
+                    E: "Pneumothorax"
+                },
+                correctAnswer: "C",
+                rationale: "GERD/Acid reflux is a listed non-life-threatening cause of chest pain.",
+                source: "Chest_Pain_and_ACS.pdf, Slide 6: \"Non-life threatening: ... GERD/Acid reflex\""
+            },
+
+            // --- Section 2: Cardiac Intervention & Surgery ---
+            {
+                section: "Cardiac Intervention & Surgery",
+                maskedLO: "LO1: Determine best management for patients with [CAD].",
+                fullLO: "LO1: Determine best management for patients with coronary artery disease",
+                question: "A patient with stable coronary artery disease has a small ischemic burden (<10% myocardium) and preserved left ventricular function. He has no left main disease. What is the most appropriate initial management strategy?",
+                options: {
+                    A: "Coronary artery bypass grafting (CABG)",
+                    B: "Heart transplantation",
+                    C: "Medical therapy",
+                    D: "Percutaneous coronary intervention (PCI) with drug-eluting stent",
+                    E: "Thrombolytic therapy"
+                },
+                correctAnswer: "C",
+                rationale: "Medical therapy is acceptable for stable CAD with small ischemic burden, preserved LV function, and no left main disease. Revascularization is for symptom relief or proven prognostic anatomy, not plaque appearance alone.",
+                source: "Cardiac_Intervention_2026.pdf, Slide 35: \"Medical Therapy vs Revascularization... When Is Medical Therapy Acceptable? Stable CAD with small ischemic burden... Preserved LV function\""
+            },
+            {
+                section: "Cardiac Intervention & Surgery",
+                maskedLO: "LO1: Determine best management for patients with [CAD].",
+                fullLO: "LO1: Determine best management for patients with coronary artery disease",
+                question: "A patient is found to have significant Left Main Coronary Artery stenosis (>50%). This condition is considered a prognostic emergency. Which of the following statements regarding the management of this lesion is correct?",
+                options: {
+                    A: "Medical therapy alone is adequate if the patient is asymptomatic.",
+                    B: "Medical therapy alone results in an annual mortality of only 1-2%.",
+                    C: "Revascularization provides a proven survival benefit over medical therapy.",
+                    D: "This lesion typically supplies only 10% of the left ventricular myocardium.",
+                    E: "Treatment should be delayed until symptoms become severe (Class IV)."
+                },
+                correctAnswer: "C",
+                rationale: "Significant Left Main disease is a prognostic emergency. Medical therapy alone is inadequate. Revascularization saves lives (proven survival benefit).",
+                source: "Cardiac_Intervention_2026.pdf, Slide 32: \"Significant Left Main Coronary Artery Disease... Proven survival benefit over medical therapy.\""
+            },
+            {
+                section: "Cardiac Intervention & Surgery",
+                maskedLO: "LO2: Determine if [intervention A] or [intervention B] are appropriate",
+                fullLO: "LO2: Determine if surgical revascularization or percutaneous revascularization are appropriate",
+                question: "A patient with three-vessel coronary artery disease and reduced left ventricular ejection fraction is being evaluated by the Heart Team. The patient also has diabetes. According to current guidelines, which revascularization strategy is generally favored?",
+                options: {
+                    A: "Coronary Artery Bypass Grafting (CABG)",
+                    B: "Laser angioplasty",
+                    C: "Medical therapy alone",
+                    D: "Percutaneous Coronary Intervention (PCI) with bare-metal stents",
+                    E: "Percutaneous Coronary Intervention (PCI) with drug-eluting stents"
+                },
+                correctAnswer: "A",
+                rationale: "CABG is favored for three-vessel disease, reduced EF, and diabetes.",
+                source: "Cardiac_Intervention_2026.pdf, Slide 30: \"CABG favored when: ... Three-vessel disease... Reduced EF... Diabetes\""
+            },
+            {
+                section: "Cardiac Intervention & Surgery",
+                maskedLO: "LO2: Determine if [intervention A] or [intervention B] are appropriate",
+                fullLO: "LO2: Determine if surgical revascularization or percutaneous revascularization are appropriate",
+                question: "A patient presents with significant Left Main Coronary Artery disease. The Heart Team calculates a high SYNTAX score (≥33), indicating complex anatomy. Which intervention is preferred for this patient?",
+                options: {
+                    A: "Coronary Artery Bypass Grafting (CABG)",
+                    B: "Medical therapy only",
+                    C: "Percutaneous Coronary Intervention (PCI)",
+                    D: "Stenting of the Right Coronary Artery only",
+                    E: "Thrombolysis"
+                },
+                correctAnswer: "A",
+                rationale: "For significant Left Main disease with a high SYNTAX score (≥33), CABG is preferred.",
+                source: "Cardiac_Intervention_2026.pdf, Slide 32: \"Significant Left Main Coronary Artery Disease... Particularly favored when: High SYNTAX score (≥33)\""
+            },
+
+            // --- Section 3: Endo/Pericarditis ---
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO1: Summarize the [relevant factors] involved.",
+                fullLO: "LO1: Summarize the hemodynamic factors involved",
+                question: "In the pathogenesis of infective endocarditis, the formation of a vegetation is often initiated by turbulent blood flow. This turbulence causes a high pressure gradient between two chambers, creating a vacuum effect known as the:",
+                options: {
+                    A: "Bernoulli principle",
+                    B: "Coanda effect",
+                    C: "Doppler effect",
+                    D: "Starling force",
+                    E: "Venturi effect"
+                },
+                correctAnswer: "E",
+                rationale: "The Venturi effect (lower pressure created by high velocity flow) allows bacteria to deposit.",
+                source: "Infective_Endocarditis_and_Pericarditis_Slides.pdf, Slide 7: \"[Image labeled 'Venturi effect' showing higher pressure -> lower pressure]\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO1: Summarize the [relevant factors] involved.",
+                fullLO: "LO1: Summarize the hemodynamic factors involved",
+                question: "When infective endocarditis affects a regurgitant valve, the vegetation is typically found on which surface relative to the high-velocity jet?",
+                options: {
+                    A: "The atrial surface of the mitral valve (low pressure side)",
+                    B: "The ventricular surface of the mitral valve (high pressure side)",
+                    C: "The aortic surface of the aortic valve in insufficiency",
+                    D: "The arterial wall distal to the valve",
+                    E: "The center of the valve leaflet"
+                },
+                correctAnswer: "A",
+                rationale: "In regurgitant valves, vegetations form on the low-pressure side. For the mitral valve, this is the atrial surface.",
+                source: "Infective_Endocarditis_and_Pericarditis_Slides.pdf, Slide 9: \"[Diagram showing 'atrial surface of mitral & tricuspid valves' and 'low pressure' side]\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO2: Explain the concept of [NBTE].",
+                fullLO: "LO2: Explain the concept of non-bacterial, thrombotic, endocarditis (NBTE)",
+                question: "Following endothelial damage in the heart, a sterile vegetation forms composed of platelets and fibrin. This initial lesion is known as:",
+                options: {
+                    A: "An abscess",
+                    B: "A septic embolus",
+                    C: "A calcified nodule",
+                    D: "Non-bacterial thrombotic endocarditis (NBTE)",
+                    E: "Rheumatic nodule"
+                },
+                correctAnswer: "D",
+                rationale: "Endothelial damage leads to platelet adhesion and clotting, forming a clump of platelets & fibrin called NBTE (sterile vegetation).",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"clump of platelets & fibrin (non-bacterial, thrombotic endocarditis)—NBTE (sterile vegetation)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO2: Explain the concept of [NBTE].",
+                fullLO: "LO2: Explain the concept of non-bacterial, thrombotic, endocarditis (NBTE)",
+                question: "Which of the following best describes the nature of Non-bacterial Thrombotic Endocarditis (NBTE) before the onset of bacteremia?",
+                options: {
+                    A: "It contains a high density of bacteria.",
+                    B: "It is a sterile vegetation.",
+                    C: "It is caused by direct viral invasion.",
+                    D: "It is highly resistant to antibiotics.",
+                    E: "It is composed primarily of white blood cells."
+                },
+                correctAnswer: "B",
+                rationale: "NBTE is explicitly described as a \"sterile vegetation\" formed by platelets and fibrin.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"NBTE (sterile vegetation)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO3: Describe how NBTE leads to [condition].",
+                fullLO: "LO3: Describe how NBTE leads to infective endocarditis",
+                question: "The transition from Non-bacterial Thrombotic Endocarditis (NBTE) to Infective Endocarditis (IE) occurs when:",
+                options: {
+                    A: "Antibodies deposit on the valve surface.",
+                    B: "Microorganisms from transient bacteremia adhere to the NBTE.",
+                    C: "The vegetation calcifies.",
+                    D: "The valve leaflet perforates.",
+                    E: "White blood cells infiltrate the endothelium."
+                },
+                correctAnswer: "B",
+                rationale: "Staph, strep, or enterococci from transient bacteremia adhere to the NBTE, making the valve infected (IE).",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"Staph, strep, enterococci (from transient bacteremia) adhere to NBTE (valve now infected--IE)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO3: Describe how NBTE leads to [condition].",
+                fullLO: "LO3: Describe how NBTE leads to infective endocarditis",
+                question: "Once bacteria adhere to the NBTE, they proliferate within the vegetation. These vegetations can contain up to how many organisms per gram?",
+                options: {
+                    A: "10^3",
+                    B: "10^4",
+                    C: "10^5",
+                    D: "10^6",
+                    E: "10^8"
+                },
+                correctAnswer: "E",
+                rationale: "Vegetations contain up to 10^8 organisms/gram.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"Vegetations contain up to 10^8 organisms/gram\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO4: List the major risk factors",
+                fullLO: "LO4: List the major risk factors",
+                question: "Which of the following is considered a high-risk condition that requires prophylactic antibiotics prior to dental procedures to prevent infective endocarditis?",
+                options: {
+                    A: "Coronary artery disease",
+                    B: "Hypertension",
+                    C: "Mitral valve prolapse without regurgitation",
+                    D: "Pacemaker",
+                    E: "Prosthetic heart valve"
+                },
+                correctAnswer: "E",
+                rationale: "High-risk patients who need prophylactic Abx include those with a prosthetic heart valve.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"High-risk patients who need prophylactic Abx... a. Prosthetic heart valve\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO4: List the major risk factors",
+                fullLO: "LO4: List the major risk factors",
+                question: "Transient bacteremia, a precursor to endocarditis, is most frequently caused by:",
+                options: {
+                    A: "Activities of daily living (e.g., tooth brushing, chewing)",
+                    B: "Cardiac catheterization",
+                    C: "Colonoscopy",
+                    D: "Routine physical exercise",
+                    E: "Skin biopsy"
+                },
+                correctAnswer: "A",
+                rationale: "Activities of daily living like tooth brushing and chewing cause a greater cumulative risk of transient bacteremia than most dental procedures.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"Activities of daily living (eg tooth brushing, flossing, chewing) → greater cumulative risk\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO5: Name the most common organisms involved",
+                fullLO: "LO5: Name the most common organisms involved",
+                question: "Which organism is the most common cause of both native valve and prosthetic valve endocarditis?",
+                options: {
+                    A: "Candida albicans",
+                    B: "Enterococcus faecalis",
+                    C: "Haemophilus influenzae",
+                    D: "Staphylococcus aureus",
+                    E: "Viridans streptococci"
+                },
+                correctAnswer: "D",
+                rationale: "S. aureus is the most common cause of native valve and prosthetic valve endocarditis (50% / 35-40%).",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 2: \"S. aureus (50%)--most common cause of native valve & prosthetic valve endocarditis\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO5: Name the most common organisms involved",
+                fullLO: "LO5: Name the most common organisms involved",
+                question: "A patient with a history of injection drug use presents with endocarditis involving the tricuspid valve. Which organism is the most likely pathogen?",
+                options: {
+                    A: "Candida spp",
+                    B: "Eikenella corrodens",
+                    C: "Staphylococcus aureus",
+                    D: "Streptococcus bovis",
+                    E: "Streptococcus pneumoniae"
+                },
+                correctAnswer: "C",
+                rationale: "Staphylococcus aureus is the most common cause (implicated in >80% of staph & strep cases, and specifically noted for native/prosthetic valves, but clinically S. aureus is the hallmark of IVDU endocarditis).",
+                source: "Infective_Endocarditis_and_Pericarditis_Slides.pdf, Slide 12: \"S. aureus... most common cause\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO6: Outline the steps in the diagnosis",
+                fullLO: "LO6: Outline the steps in the diagnosis",
+                question: "According to the Duke Criteria for the diagnosis of infective endocarditis, which of the following is considered a Major Microbiologic Criterion?",
+                options: {
+                    A: "Positive blood culture for a typical organism (e.g., S. aureus) from 2 separate blood cultures",
+                    B: "Positive blood culture for coagulase-negative staph from a single culture",
+                    C: "Positive blood culture for Diphtheroids",
+                    D: "Serological evidence of active infection with an organism consistent with IE",
+                    E: "Single positive blood culture for a common skin contaminant"
+                },
+                correctAnswer: "A",
+                rationale: "Major Microbiologic Criteria include positive blood cultures for typical organisms isolated from 2 separate blood cultures.",
+                source: "Infective_Endocarditis_and_Pericarditis_Slides.pdf, Slide 17: \"Microbiologic Major Criteria... typical organisms (eg S. aureus, viridans strep, HACEK) (2 separate blood cultures)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO6: Outline the steps in the diagnosis",
+                fullLO: "LO6: Outline the steps in the diagnosis",
+                question: "A patient is suspected of having infective endocarditis, but the transthoracic echocardiogram (TTE) is equivocal. Which imaging modality is considered a Major Imaging Criterion and has higher sensitivity for detecting vegetations?",
+                options: {
+                    A: "Cardiac MRI",
+                    B: "Chest X-ray",
+                    C: "Fluoroscopy",
+                    D: "Transesophageal echocardiogram (TEE)",
+                    E: "Ultrasound of the abdomen"
+                },
+                correctAnswer: "D",
+                rationale: "Echocardiography showing a vegetation is a Major Criterion. TEE has a sensitivity >90% compared to TTE (50-60%).",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 3 & 4: \"Imaging Major Criteria... Echocardiography... TEE (sensitivity 90%)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO7: Summarize the basic principles of treatment",
+                fullLO: "LO7: Summarize the basic principles of treatment",
+                question: "The treatment of infective endocarditis generally requires high-dose intravenous antibiotics for a prolonged duration. For a patient with native valve endocarditis due to penicillin-susceptible streptococci, the standard duration of therapy is:",
+                options: {
+                    A: "1 week",
+                    B: "4 weeks",
+                    C: "10 days",
+                    D: "3 months",
+                    E: "6 months"
+                },
+                correctAnswer: "B",
+                rationale: "For penicillin-susceptible streptococci, the treatment is 4 weeks of IV PCN G or ceftriaxone.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 6: \"Penicillin-susceptible... 4 wks of iv PCN G or ceftriaxone\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO7: Summarize the basic principles of treatment",
+                fullLO: "LO7: Summarize the basic principles of treatment",
+                question: "Surgery is indicated for infective endocarditis in certain high-risk situations. Which of the following is an indication for early surgery?",
+                options: {
+                    A: "Fever persisting for 2 days after starting antibiotics",
+                    B: "Small vegetation (<5mm)",
+                    C: "Streptococcal infection responsive to antibiotics",
+                    D: "Tricuspid valve involvement without failure",
+                    E: "Valve dysfunction causing heart failure"
+                },
+                correctAnswer: "E",
+                rationale: "Early surgery indications include severe valve dysfunction leading to CHF.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 7: \"Early surgery: a. Severe valve dysfunction → CHF\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO8: Describe the clinical picture",
+                fullLO: "LO8: Describe the clinical picture",
+                question: "A patient with infective endocarditis presents with painless, flat, hemorrhagic lesions on the palms and soles. These are known as:",
+                options: {
+                    A: "Janeway lesions",
+                    B: "Osler nodes",
+                    C: "Petechiae",
+                    D: "Roth spots",
+                    E: "Splinter hemorrhages"
+                },
+                correctAnswer: "A",
+                rationale: "Janeway lesions are flat, hemorrhagic lesions on the palms and soles. (Osler nodes are painful and nodular).",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 3: \"Janeway lesions (flat hemorrhagic—palms & soles)\""
+            },
+            {
+                section: "Endo/Pericarditis",
+                maskedLO: "LO8: Describe the clinical picture",
+                fullLO: "LO8: Describe the clinical picture",
+                question: "A patient with infective endocarditis undergoes an ophthalmologic exam. The physician notes whitish retinal spots surrounded by hemorrhage. These lesions are referred to as:",
+                options: {
+                    A: "Cotton wool spots",
+                    B: "Hollenhorst plaques",
+                    C: "Janeway lesions",
+                    D: "Osler nodes",
+                    E: "Roth spots"
+                },
+                correctAnswer: "E",
+                rationale: "Roth spots are whitish retinal spots surrounded by hemorrhage.",
+                source: "Infective_Endocarditis_and_Pericarditis.pdf, Page 3: \"Roth spots (whitish retinal spots surrounded by hemorrhage)\""
+            }
+        ];
+
+        // --- Core Logic ---
+        const quizRoot = document.getElementById('quiz-root');
+        const themeSelect = document.getElementById('theme-select');
+        const pinBtn = document.getElementById('pin-btn');
+        const mainHeader = document.getElementById('main-header');
+
+        function initQuiz() {
+            // Render Questions
+            let currentSection = "";
+            
+            quizData.forEach((item, index) => {
+                // Insert Section Header if needed
+                if (item.section !== currentSection) {
+                    currentSection = item.section;
+                    const sectionHeader = document.createElement('h2');
+                    sectionHeader.className = 'section-header';
+                    sectionHeader.textContent = currentSection;
+                    quizRoot.appendChild(sectionHeader);
+                }
+
+                // Create Card
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = `q-card-${index}`;
+
+                // Learning Objective (Masked)
+                const loBox = document.createElement('div');
+                loBox.className = 'lo-box';
+                loBox.id = `lo-${index}`;
+                loBox.textContent = item.maskedLO;
+                card.appendChild(loBox);
+
+                // Question Text
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.textContent = `${index + 1}. ${item.question}`;
+                card.appendChild(qText);
+
+                // Options Container
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'options-grid';
+
+                for (const [key, value] of Object.entries(item.options)) {
+                    const label = document.createElement('label');
+                    label.className = 'option-label';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = key;
+
+                    const span = document.createElement('span');
+                    span.textContent = `${key}. ${value}`;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    optionsGrid.appendChild(label);
+                }
+                card.appendChild(optionsGrid);
+
+                // Check Button
+                const btn = document.createElement('button');
+                btn.className = 'btn-check';
+                btn.textContent = 'Check Answer';
+                btn.onclick = () => checkAnswer(index);
+                card.appendChild(btn);
+
+                // Feedback Container
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `feedback-${index}`;
+                card.appendChild(feedback);
+
+                quizRoot.appendChild(card);
+            });
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('quizTheme') || 'dark';
+            changeTheme(savedTheme);
+            themeSelect.value = savedTheme;
+
+            // Load saved pin state
+            const savedPinState = localStorage.getItem('headerPinned');
+            // Default to true (pinned) if not set or if set to true
+            if (savedPinState === 'false') {
+                toggleHeader(false); 
+            } else {
+                toggleHeader(true);
+            }
+        }
+
+        function checkAnswer(index) {
+            const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+            const feedbackEl = document.getElementById(`feedback-${index}`);
+            const loEl = document.getElementById(`lo-${index}`);
+            const data = quizData[index];
+
+            if (!selected) {
+                alert("Please select an answer.");
+                return;
+            }
+
+            // Reveal LO
+            loEl.textContent = data.fullLO;
+
+            // Generate Feedback HTML
+            const isCorrect = selected.value === data.correctAnswer;
+            
+            let html = `<span class="feedback-header">${isCorrect ? "Correct!" : "Incorrect"}</span>`;
+            if (!isCorrect) {
+                html += `<div>The correct answer is <strong>${data.correctAnswer}</strong>.</div>`;
+            }
+            
+            html += `<div class="rationale"><strong>Rationale:</strong> ${data.rationale}</div>`;
+            html += `<div class="source"><strong>Source:</strong> ${data.source}</div>`;
+
+            feedbackEl.innerHTML = html;
+            feedbackEl.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackEl.style.display = 'block';
+        }
+
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('quizTheme', themeName);
+        }
+
+        function toggleHeader(forceState) {
+            // Determine current state based on class presence
+            const isCurrentlyPinned = !mainHeader.classList.contains('unpinned');
+            
+            // If forceState is provided (boolean), use it. Otherwise toggle current state.
+            const newState = (typeof forceState === 'boolean') ? forceState : !isCurrentlyPinned;
+
+            if (newState) {
+                // Pin
+                mainHeader.classList.remove('unpinned');
+                pinBtn.classList.add('pin-active');
+                localStorage.setItem('headerPinned', 'true');
+            } else {
+                // Unpin
+                mainHeader.classList.add('unpinned');
+                pinBtn.classList.remove('pin-active');
+                localStorage.setItem('headerPinned', 'false');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initQuiz);
+
+    </script>
+</body>
+</html>
