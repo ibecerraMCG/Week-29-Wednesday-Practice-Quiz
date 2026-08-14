@@ -1047,6 +1047,28 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
     body.tracker-header .hdr-track { padding: 0 7px; }
 }
 </style>
+
+<style id="tutor-retry-style">
+/* The retry control sits at the right-hand end of the live-score row, at the
+   foot of the page next to "Back to top" / "View score", and - when the live
+   score is switched off, so there is no score row to host it - on its own row
+   in the same place the score row would have been. */
+.tt-card .tt-retry, #tutor-retry-top .tt-retry {
+    align-self: center; background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: 9px; padding: 0.4rem 0.8rem;
+    font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+    transition: all 0.16s; }
+.tt-card .tt-retry:hover, #tutor-retry-top .tt-retry:hover {
+    border-color: var(--text-accent); color: var(--text-accent); transform: translateY(-1px); }
+/* It rides at the right-hand end of the Questions / Sections / Mode summary
+   row rather than on a row of its own, which left an odd gap above the first
+   section. margin-left:auto pushes it past the last figure. */
+#tutor-retry-top { display: none; margin-left: auto; align-self: center; }
+#tutor-retry-banner { display: none; }
+/* The navigator's own way out of a pass, directly above "Reset quiz". */
+#nav-retry-exit-btn { margin-bottom: 0.5rem; }
+#nav-retry-exit-btn:hover { color: var(--text-accent); border-color: var(--text-accent); }
+</style>
 </head>
 
 <body>
@@ -1211,6 +1233,10 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
             <div class="legend-item legend-graded" style="display:none"><span class="legend-swatch incorrect"></span> Incorrect</div>
         </div>
         <div class="nav-tools">
+            <button id="nav-retry-exit-btn" class="nav-tool-btn" onclick="tutorExitRetry()" style="display:none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
+                Show all questions
+            </button>
             <button id="reset-quiz-btn" class="nav-tool-btn danger" onclick="resetQuizClick(this)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                 Reset quiz
@@ -1266,6 +1292,7 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
                 <div class="qm"><span class="n" id="meta-q">0</span><span class="l">Questions</span></div>
                 <div class="qm"><span class="n" id="meta-sec">0</span><span class="l">Sections</span></div>
                 <div class="qm"><span class="n" id="meta-mode">Tutor</span><span class="l">Mode</span></div>
+                <div id="tutor-retry-top"><button class="tt-retry" id="tutor-retry-top-btn" onclick="tutorRetryIncorrect()">🔁 Retry incorrect</button></div>
             </div>
             <div class="mode-hint" id="mode-hint" style="display:none"><span class="mh-ic">💡</span><span id="mode-hint-text">Added toggle in the settings dropdown to switch to old quiz site design (switch back to new from theme menu)</span></div>
         </div>
@@ -1287,6 +1314,7 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
         <div class="quiz-return">
             <a href="https://ibecerramcg.github.io/CP-Heme-Practice-Quizzes/" class="btn-link">← Return to Quiz Directory</a>
             <button class="btn-link" id="view-score-btn" onclick="jumpToTracker()" style="display:none">↑ View score</button>
+            <button class="btn-link" id="tutor-retry-btn" onclick="tutorRetryIncorrect()" style="display:none">🔁 Retry incorrect</button>
             <button class="btn-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</button>
         </div>
     </main>
@@ -1369,6 +1397,7 @@ const K = {
     gradeTrack:'q_' + QUIZ_ID + '_gradeTrack',   // tutor live score tracker on/off
     snapshot:  'q_' + QUIZ_ID + '_snapshot',     // last exam grade (keeps the report visible)
     retrySet:  'q_' + QUIZ_ID + '_retrySet'      // indices being retried (for the retry-results element)
+    ,tutorRetry: 'q_' + QUIZ_ID + '_tutorRetry'   // the tutor-mode retry pass: which questions, and what they were before
 };
 
 const root = document.documentElement;
@@ -1848,6 +1877,9 @@ function syncModeButtons() {
 }
 function setMode(newMode) {
     if (mode === newMode) return;
+    // a pass only makes sense in tutor mode; close it out first so the
+    // parked answers are restored rather than stranded
+    if (typeof tutorRetry !== 'undefined' && tutorRetry && newMode !== 'tutor') tutorExitRetry();
     // Prevent switching away from a graded exam without warning
     mode = newMode;
     localStorage.setItem(K.mode, mode);
@@ -2100,11 +2132,14 @@ function doResetQuiz() {
     save(K.strikes, strikes); save(K.hl, highlights);
     gradedSnapshot = null; save(K.snapshot, null);   // clear the saved score report
     retrySet = []; save(K.retrySet, retrySet);       // clear any pending retry pass
+    tutorRetry = null; save(K.tutorRetry, null);   // and any tutor retry pass
     const rc = document.getElementById('results-card');
     rc.classList.remove('show'); rc.innerHTML = '';
     const banner = document.getElementById('retry-banner'); if (banner) banner.style.display = 'none';
     retryMode = false;
     renderQuiz();
+    applyTutorRetryView();   // clears the banner, the narrowed navigator and the retry controls
+    updateProgress();
     updateTutorTracker();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2179,12 +2214,18 @@ function toggleLOs() {
 }
 
 function updateProgress() {
-    const answered = quizData.filter((_, i) => answers[i] != null).length;
+    /* During a tutor retry pass the tracker reports the pass, not the quiz. */
+    const pool = (typeof tutorRetry !== 'undefined' && tutorRetry)
+        ? tutorRetry.set : quizData.map((_, i) => i);
+    const answered = pool.filter(i => answers[i] != null).length;
     const flagged = Object.keys(flags).length;
     document.getElementById('answered-count').textContent = answered;
+    /* buildNavigator() writes the quiz length here; a pass overrides it. */
+    document.getElementById('total-count').textContent = pool.length;
     document.getElementById('flag-count').textContent = flagged;
-    document.getElementById('progress-fill').style.width = (answered / quizData.length * 100) + '%';
-    if (typeof updateHdrTrack === 'function') updateHdrTrack(answered, flagged);
+    document.getElementById('progress-fill').style.width =
+        (pool.length ? answered / pool.length * 100 : 0) + '%';
+    if (typeof updateHdrTrack === 'function') updateHdrTrack(answered, flagged, pool.length);
 }
 
 /* ============================================================
@@ -2221,24 +2262,31 @@ function updateTutorTracker() {
     if (!el) return;
     const show = gradeTrack && mode === 'tutor';
     el.classList.toggle('show', show);
-    if (!show) { el.innerHTML = ''; return; }
+    if (!show) { el.innerHTML = ''; syncTutorRetryButtons(); return; }
+    /* During a retry pass the score is out of the missed questions only, the
+       same as the exam-mode pass reports. */
+    const inRetry = !!tutorRetry;
+    const pool = inRetry ? tutorRetry.set : quizData.map((_, i) => i);
     let gradedN = 0, correct = 0;
-    quizData.forEach((q, i) => { if (submitted[i]) { gradedN++; if (answers[i] === q.correctAnswer) correct++; } });
+    pool.forEach(i => { if (submitted[i]) { gradedN++; if (answers[i] === quizData[i].correctAnswer) correct++; } });
     const incorrect = gradedN - correct;
-    const remaining = quizData.length - gradedN;
+    const remaining = pool.length - gradedN;
     const pct = gradedN ? Math.round((correct / gradedN) * 100) : 0;
-    const barPct = Math.round((gradedN / quizData.length) * 100);
+    const barPct = pool.length ? Math.round((gradedN / pool.length) * 100) : 0;
+    const canRetry = inRetry || tutorWrongList().length > 0;
     el.innerHTML = `
         <div class="tt-card">
-            <span class="tt-label">Live score</span>
+            <span class="tt-label">${inRetry ? 'Retry score' : 'Live score'}</span>
             <span class="tt-main">${correct} / ${gradedN} <span class="tt-pct">· ${pct}%</span></span>
             <div class="tt-tallies">
                 <span class="tt-correct">✓ ${correct}</span>
                 <span class="tt-incorrect">✗ ${incorrect}</span>
                 <span class="tt-remaining">${remaining} left</span>
             </div>
+            ${canRetry ? `<button class="tt-retry" id="tt-retry-btn" onclick="tutorRetryIncorrect()">${inRetry ? '↺ Show all' : '\u{1F501} Retry incorrect'}</button>` : ''}
             <div class="tt-track"><div class="tt-fill" style="width:${barPct}%"></div></div>
         </div>`;
+    syncTutorRetryButtons();
 }
 
 function jumpToTracker() {
@@ -2687,12 +2735,13 @@ function toggleConvWarning() {
 
 
 /* ---- relocatable progress tracker ---- */
-function updateHdrTrack(answered, flagged) {
+function updateHdrTrack(answered, flagged, total) {
     const f = document.getElementById('ht-fill');
     if (f) {
+        if (total == null) total = quizData.length;   /* no pass running */
         document.getElementById('ht-count').textContent = answered;
-        document.getElementById('ht-total').textContent = quizData.length;
-        f.style.width = (answered / quizData.length * 100) + '%';
+        document.getElementById('ht-total').textContent = total;
+        f.style.width = (total ? answered / total * 100 : 0) + '%';
     }
     const lf = document.getElementById('legend-flag-count');
     if (lf) lf.textContent = '⚑ ' + flagged;
@@ -2717,6 +2766,172 @@ function syncGradeHero() {
     el.setAttribute('aria-checked', on ? 'true' : 'false');
     const block = document.getElementById('grade-setup-block');
     if (block) block.style.display = (mode === 'tutor') ? '' : 'none';
+}
+
+
+/* ============================================================
+   TUTOR MODE - RETRY INCORRECT
+   The exam-mode pass deletes the missed answers outright. Tutor mode keeps a
+   record of how every question was last answered, so instead of deleting them
+   this parks them in `prev`:
+
+     start   -> answer + submitted cleared, old values parked. The card is blank
+                and the navigator shows no indicator (nothing to indicate yet).
+     answer  -> normal tutor reveal, so the new attempt shows green/red.
+     finish  -> "Show all questions" restores the parked value for anything that
+                was NOT re-answered, so the old red comes back exactly as it was.
+                Re-answered questions keep their new result and overrule the old.
+
+   The pass is persisted, because a reload with the answers merely cleared and
+   nothing parked would lose the record permanently.
+============================================================ */
+let tutorRetry = load(K.tutorRetry, null);
+
+/* Questions that have actually been answered and marked wrong. */
+function tutorWrongList() {
+    return quizData
+        .map((q, i) => (submitted[i] && answers[i] != null && answers[i] !== q.correctAnswer) ? i : -1)
+        .filter(i => i >= 0);
+}
+
+function tutorRetryIncorrect() {
+    if (mode !== 'tutor') return;
+    if (tutorRetry) { tutorExitRetry(); return; }      // the control toggles
+
+    const wrong = tutorWrongList();
+    if (!wrong.length) { flashTutorRetry('Nothing to retry yet'); return; }
+
+    const prev = {};
+    wrong.forEach(i => {
+        prev[i] = { a: answers[i], s: !!submitted[i] };
+        delete answers[i];
+        delete submitted[i];
+    });
+    tutorRetry = { set: wrong, prev: prev };
+    save(K.tutorRetry, tutorRetry);
+    save(K.answers, answers);
+    save(K.submitted, submitted);
+
+    renderQuiz();
+    applyTutorRetryView();
+    updateProgress();
+    updateTutorTracker();
+    const first = document.getElementById('q-card-' + wrong[0]);
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function tutorExitRetry() {
+    if (!tutorRetry) return;
+    /* Anything not re-answered in this pass goes back exactly as it was - that
+       is what brings the red indicator back. A question that WAS re-answered
+       keeps whatever it is now, right or wrong. */
+    tutorRetry.set.forEach(i => {
+        if (submitted[i]) return;                       // re-answered: leave it
+        const p = tutorRetry.prev[i] || {};
+        if (p.a != null) answers[i] = p.a; else delete answers[i];
+        if (p.s) submitted[i] = true; else delete submitted[i];
+    });
+    tutorRetry = null;
+    save(K.tutorRetry, null);
+    save(K.answers, answers);
+    save(K.submitted, submitted);
+
+    renderQuiz();
+    applyTutorRetryView();
+    updateProgress();
+    updateTutorTracker();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Show only the questions in the pass, hide dividers left with nothing under
+   them, and put up the banner. Also called on load so a saved pass survives. */
+function applyTutorRetryView() {
+    const on = !!tutorRetry;
+    const inSet = new Set(on ? tutorRetry.set : []);
+    quizData.forEach((_, i) => {
+        const card = document.getElementById('q-card-' + i);
+        if (card) card.style.display = (!on || inSet.has(i)) ? '' : 'none';
+    });
+    document.querySelectorAll('.section-divider').forEach(d => {
+        let n = d.nextElementSibling, any = false;
+        while (n && !n.classList.contains('section-divider')) {
+            if (n.classList.contains('question-card') && n.style.display !== 'none') any = true;
+            n = n.nextElementSibling;
+        }
+        d.style.display = any ? '' : 'none';
+    });
+
+    /* The navigator narrows to the same set, so the sidebar matches what is on
+       screen; a section left with no cells drops out too. renderQuiz() rebuilds
+       the navigator, and this always runs after it. */
+    quizData.forEach((_, i) => {
+        const cell = document.getElementById('nav-cell-' + i);
+        if (cell) cell.style.display = (!on || inSet.has(i)) ? '' : 'none';
+    });
+    document.querySelectorAll('.nav-section').forEach(sec => {
+        const any = [...sec.querySelectorAll('.nav-cell')].some(c => c.style.display !== 'none');
+        sec.style.display = any ? '' : 'none';
+    });
+
+    const banner = tutorRetryBanner();
+    if (on) {
+        const n = tutorRetry.set.length;
+        banner.innerHTML = '<span>\u{1F501} Retrying <b>' + n + '</b> missed question' +
+            (n > 1 ? 's' : '') + '.</span>' +
+            '<button class="results-btn" onclick="tutorExitRetry()">Show all questions</button>';
+        banner.style.display = 'flex';
+    } else {
+        banner.style.display = 'none';
+    }
+    syncTutorRetryButtons();
+}
+
+function tutorRetryBanner() {
+    let b = document.getElementById('tutor-retry-banner');
+    if (!b) {
+        b = document.createElement('div');
+        b.id = 'tutor-retry-banner';
+        b.className = 'retry-banner';
+        const root = document.getElementById('quiz-root');
+        root.parentNode.insertBefore(b, root);
+    }
+    return b;
+}
+
+/* Every retry control outside the score row: the foot-of-page one, the
+   navigator's way out of a pass, and the standalone top row that stands in for
+   the score row when the live score is switched off. All of them only ever
+   appear in tutor mode, and only once something has actually been missed. */
+function syncTutorRetryButtons() {
+    const inRetry = !!tutorRetry;
+    const canRetry = mode === 'tutor' && (inRetry || tutorWrongList().length > 0);
+
+    const btn = document.getElementById('tutor-retry-btn');
+    if (btn) {
+        btn.style.display = canRetry ? '' : 'none';
+        btn.textContent = inRetry ? '↺ Show all questions' : '\u{1F501} Retry incorrect';
+    }
+
+    /* Only while a pass is open - it does nothing at any other time. */
+    const nav = document.getElementById('nav-retry-exit-btn');
+    if (nav) nav.style.display = (mode === 'tutor' && inRetry) ? '' : 'none';
+
+    /* With the live score on, the score row hosts the control. With it off
+       there is no score row, so this row takes its place. During a pass the
+       banner above the questions already offers the way out, so this one is
+       only the way IN. */
+    const top = document.getElementById('tutor-retry-top');
+    if (top) top.style.display = (canRetry && !gradeTrack && !inRetry) ? 'flex' : 'none';
+}
+
+function flashTutorRetry(msg) {
+    const btn = document.getElementById('tutor-retry-btn') ||
+                document.getElementById('tt-retry-btn') ||
+                document.getElementById('tutor-retry-top-btn');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = msg;
+    setTimeout(() => { btn.textContent = orig; }, 1500);
 }
 
 (function init() {
@@ -2760,6 +2975,7 @@ function syncGradeHero() {
     // render
     renderQuiz();
     // tutor live score tracker + persistent exam report
+    applyTutorRetryView();   // re-apply a retry pass left open last time
     applyGradeTrackUI();
     updateTutorTracker();
     refreshResults();
