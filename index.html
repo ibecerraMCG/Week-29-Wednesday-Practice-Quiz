@@ -2178,6 +2178,8 @@ function retryIncorrect() {
         while (n && !n.classList.contains('section-divider')) { if (n.classList.contains('question-card') && n.style.display !== 'none') anyVisible = true; n = n.nextElementSibling; }
         d.style.display = anyVisible ? '' : 'none';
     });
+    // the navigator narrows to the same set, so the sidebar matches the page
+    bbNarrowNavigator(wrong);
     // banner + scroll to first
     showRetryBanner(wrong.length);
     const first = document.getElementById('q-card-' + wrong[0]);
@@ -2202,6 +2204,8 @@ function exitRetry() {
     if (banner) banner.style.display = 'none';
     quizData.forEach((_, i) => { const c = document.getElementById('q-card-' + i); if (c) c.style.display = ''; });
     document.querySelectorAll('.section-divider').forEach(d => d.style.display = '');
+    bbNarrowNavigator(null);
+    updateProgress();   // the pass is over: count the whole quiz again
     refreshResults();   // bring the score report back — it persists until Reset quiz
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2215,8 +2219,13 @@ function toggleLOs() {
 
 function updateProgress() {
     /* During a tutor retry pass the tracker reports the pass, not the quiz. */
-    const pool = (typeof tutorRetry !== 'undefined' && tutorRetry)
-        ? tutorRetry.set : quizData.map((_, i) => i);
+    /* A retry pass reports the pass, not the quiz - in either mode. */
+    const examPass = (typeof retryMode !== 'undefined' && retryMode &&
+                      typeof retrySet !== 'undefined' && retrySet && retrySet.length)
+                     ? retrySet : null;
+    const pool = (typeof tutorRetry !== 'undefined' && tutorRetry) ? tutorRetry.set
+               : examPass ? examPass
+               : quizData.map((_, i) => i);
     const answered = pool.filter(i => answers[i] != null).length;
     const flagged = Object.keys(flags).length;
     document.getElementById('answered-count').textContent = answered;
@@ -2845,6 +2854,23 @@ function tutorExitRetry() {
 
 /* Show only the questions in the pass, hide dividers left with nothing under
    them, and put up the banner. Also called on load so a saved pass survives. */
+/* ------------------------------------------------------------------
+   The question navigator narrows to whatever is on screen. Both retry passes
+   go through here - tutor mode via applyTutorRetryView(), exam mode directly -
+   so the two behave the same. Pass null to show every question again.
+------------------------------------------------------------------ */
+function bbNarrowNavigator(set) {
+    const inSet = set ? new Set(set) : null;
+    quizData.forEach((_, i) => {
+        const cell = document.getElementById('nav-cell-' + i);
+        if (cell) cell.style.display = (!inSet || inSet.has(i)) ? '' : 'none';
+    });
+    document.querySelectorAll('.nav-section').forEach(sec => {
+        const any = [...sec.querySelectorAll('.nav-cell')].some(c => c.style.display !== 'none');
+        sec.style.display = any ? '' : 'none';
+    });
+}
+
 function applyTutorRetryView() {
     const on = !!tutorRetry;
     const inSet = new Set(on ? tutorRetry.set : []);
@@ -2861,17 +2887,8 @@ function applyTutorRetryView() {
         d.style.display = any ? '' : 'none';
     });
 
-    /* The navigator narrows to the same set, so the sidebar matches what is on
-       screen; a section left with no cells drops out too. renderQuiz() rebuilds
-       the navigator, and this always runs after it. */
-    quizData.forEach((_, i) => {
-        const cell = document.getElementById('nav-cell-' + i);
-        if (cell) cell.style.display = (!on || inSet.has(i)) ? '' : 'none';
-    });
-    document.querySelectorAll('.nav-section').forEach(sec => {
-        const any = [...sec.querySelectorAll('.nav-cell')].some(c => c.style.display !== 'none');
-        sec.style.display = any ? '' : 'none';
-    });
+    /* renderQuiz() rebuilds the navigator, and this always runs after it. */
+    bbNarrowNavigator(on ? tutorRetry.set : null);
 
     const banner = tutorRetryBanner();
     if (on) {
