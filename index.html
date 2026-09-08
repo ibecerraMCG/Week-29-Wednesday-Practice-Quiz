@@ -856,7 +856,9 @@
     .typo-step.sm { font-size: 0.74rem; }
     .typo-step.lg { font-size: 1.02rem; }
     #typo-scale-val { font-size: 0.86rem; font-weight: 700; color: var(--text-accent); min-width: 54px; text-align: center; }
-    #typo-scale-range { width: 100%; margin-top: 10px; accent-color: var(--text-accent); cursor: pointer; }
+    #typo-scale-range, #typo-width-range { width: 100%; margin-top: 10px; accent-color: var(--text-accent); cursor: pointer; }
+    #typo-width-val { font-size: 0.86rem; font-weight: 700; color: var(--text-accent); min-width: 54px; text-align: center; }
+    .typo-hint { margin-top: 7px; font-size: 0.68rem; line-height: 1.4; color: var(--text-muted); }
     .typo-fonts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .typo-font {
         padding: 8px 9px; border-radius: 8px; border: 1px solid var(--border-color); background: none;
@@ -1124,7 +1126,7 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
             <option value="contrast">High Contrast</option>
             <option value="custom">⚙️ Custom…</option>
         </select></div>
-        <button id="typo-btn" class="icon-btn" onclick="bbToggleTypo()" title="Text size &amp; font" aria-label="Text size and font" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19l5.5-14L14 19"/><path d="M5.2 14h6.6"/><path d="M15.5 19l3.2-8 3.3 8"/><path d="M16.7 16.4h4"/></svg></button>
+        <button id="typo-btn" class="icon-btn" onclick="bbToggleTypo()" title="Text, width &amp; font" aria-label="Text, width and font" aria-expanded="false"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19l5.5-14L14 19"/><path d="M5.2 14h6.6"/><path d="M15.5 19l3.2-8 3.3 8"/><path d="M16.7 16.4h4"/></svg></button>
         <button id="settings-btn" class="icon-btn" onclick="toggleSettings()" title="Settings" aria-label="Settings">⚙️</button>
     </div>
 
@@ -1135,9 +1137,9 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
         <div class="cpg"><label>Accent</label><input type="color" id="color-accent" value="#38bdf8" oninput="updateCustomTheme()"></div>
     </div>
 
-    <div id="typo-panel" role="dialog" aria-label="Text size and font">
+    <div id="typo-panel" role="dialog" aria-label="Text, width and font">
         <div class="typo-head">
-            <span class="typo-head-title">Text size &amp; font</span>
+            <span class="typo-head-title">Text, width &amp; font</span>
             <button class="typo-reset" onclick="bbResetTypography()">Reset</button>
         </div>
 
@@ -1150,6 +1152,18 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
             </div>
             <input type="range" id="typo-scale-range" min="60" max="200" step="5" value="100"
                    oninput="bbSetTextScale(this.value)" aria-label="Text size percentage">
+        </div>
+
+        <div class="typo-group">
+            <div class="typo-label">Content width</div>
+            <div class="typo-size">
+                <button class="typo-step" onclick="bbStepContentWidth(-10)" aria-label="Narrower content" title="Narrower">&#8677;&#8676;</button>
+                <span id="typo-width-val">100%</span>
+                <button class="typo-step" onclick="bbStepContentWidth(10)" aria-label="Wider content" title="Wider">&#8676;&#8677;</button>
+            </div>
+            <input type="range" id="typo-width-range" min="100" max="200" step="10" value="100"
+                   oninput="bbSetContentWidth(this.value)" aria-label="Content width percentage">
+            <div class="typo-hint">Uses the empty space beside the question cards.</div>
         </div>
 
         <div class="typo-group">
@@ -1366,9 +1380,9 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
                 <p class="help-tip">Turn on <b>Auto-submit answers</b> (top of the page, Tutor mode) to reveal feedback the instant you pick a choice — no need to press Submit each time.</p>
             </div>
             <div class="help-section">
-                <h3>Text size &amp; font</h3>
-                <p class="help-tip">The <b>Aa button</b> in the header opens the text options. Use <b>Text size</b> to make everything on the page larger or smaller, and <b>Font</b> to switch to a different typeface.</p>
-                <p class="help-tip"><b>Reset</b> puts both back to the defaults.</p>
+                <h3>Text, width &amp; font</h3>
+                <p class="help-tip">The <b>Aa button</b> in the header opens the text options. Use <b>Text size</b> to make everything on the page larger or smaller, <b>Content width</b> to spend the empty space beside the question cards, and <b>Font</b> to switch to a different typeface.</p>
+                <p class="help-tip"><b>Reset</b> puts them all back to the defaults.</p>
             </div>
         </div>
     </div>
@@ -3028,31 +3042,60 @@ const BB_HEADER_TEXT = [
     ['.icon-btn', 0.9], ['.icon-btn .btn-label', 0.78], ['#theme-select', 0.82]
 ];
 
+/* The reading column is capped at BB_CONTENT_MAX and centred, which on a wide
+   screen leaves a band of empty space either side of the cards. This spends it:
+   100% is the design width, 200% lets the column grow to twice that - in
+   practice as far as the window allows, since a max-width only ever stops
+   constraining. */
+const BB_WIDTH_MIN = 100, BB_WIDTH_MAX = 200;
+
 let bbTextScale = parseInt(localStorage.getItem('bb_textScale'), 10);
 if (!(bbTextScale >= BB_SCALE_MIN && bbTextScale <= BB_SCALE_MAX)) bbTextScale = 100;
 let bbFontId = localStorage.getItem('bb_fontFamily') || 'default';
+let bbContentWidth = parseInt(localStorage.getItem('bb_contentWidth'), 10);
+if (!(bbContentWidth >= BB_WIDTH_MIN && bbContentWidth <= BB_WIDTH_MAX)) bbContentWidth = 100;
 
-/* Layout that has to react to the text size. Nothing is emitted at 100%, so the
-   stylesheet is left exactly as authored unless the reader opts in. */
+/* Layout that has to react to the text size and the content width. Nothing is
+   emitted while both are at 100%, so the stylesheet is left exactly as authored
+   unless the reader opts in. */
 function bbLayoutRules() {
-    if (bbTextScale === 100) return '';
     const s = bbTextScale / 100;
-    const d = 1 + (s - 1) * BB_HEADER_DAMP;
-    let out = ':root{--header-h:' + Math.max(BB_HEADER_BASE, Math.round(BB_HEADER_BASE * d)) + 'px;}';
-    out += BB_HEADER_TEXT.map(function (r) {
-        return '#main-header ' + r[0] + '{font-size:' + (r[1] * 16 * d).toFixed(2) + 'px;}';
-    }).join('');
-    /* Above 100%, widen the reading column with the text and tighten the frame
-       around it, so a larger size means larger text rather than fewer words per
-       line. Floors keep the padding from ever collapsing onto the content.
-       The sidebar is deliberately left alone - it is drag-resizable. */
-    if (bbTextScale > 100) {
-        const shrink = Math.max(0.55, 1 - (s - 1) * 0.75);
-        const side = Math.max(14, Math.round(BB_CONTENT_PAD * shrink));
-        out += '#main-content{max-width:' + Math.round(BB_CONTENT_MAX * s) + 'px;' +
-                   'padding-left:' + side + 'px;padding-right:' + side + 'px;}' +
-               BB_CARD_SEL + '{padding:' + Math.max(12, Math.round(BB_CARD_PAD_V * shrink)) + 'px ' +
-                                            Math.max(14, Math.round(BB_CARD_PAD_H * shrink)) + 'px;}';
+    if (bbTextScale === 100 && bbContentWidth === 100) return '';
+    let out = '';
+
+    /* The toolbar only tracks the text size; widening the column must not
+       change the chrome. */
+    if (bbTextScale !== 100) {
+        const d = 1 + (s - 1) * BB_HEADER_DAMP;
+        out += ':root{--header-h:' + Math.max(BB_HEADER_BASE, Math.round(BB_HEADER_BASE * d)) + 'px;}';
+        out += BB_HEADER_TEXT.map(function (r) {
+            return '#main-header ' + r[0] + '{font-size:' + (r[1] * 16 * d).toFixed(2) + 'px;}';
+        }).join('');
+    }
+
+    /* Above 100%, the column widens with the text and the frame around it
+       tightens, so a larger size means larger text rather than fewer words per
+       line. The width control multiplies the same base, so the two compose
+       instead of one overriding the other. Floors keep the padding from ever
+       collapsing onto the content. The sidebar is deliberately left alone - it
+       is drag-resizable. */
+    if (bbTextScale > 100 || bbContentWidth !== 100) {
+        const shrink = bbTextScale > 100 ? Math.max(0.55, 1 - (s - 1) * 0.75) : 1;
+        const grow = Math.max(s, 1) * (bbContentWidth / 100);
+        let side = Math.round(BB_CONTENT_PAD * shrink);
+        /* Widening is about reclaiming the margins, so the frame gives way with
+           it - down to just over half at the far end. */
+        if (bbContentWidth > 100) {
+            const t = (bbContentWidth - BB_WIDTH_MIN) / (BB_WIDTH_MAX - BB_WIDTH_MIN);
+            side = Math.round(side * (1 - 0.55 * t));
+        }
+        out += '#main-content{max-width:' + Math.round(BB_CONTENT_MAX * grow) + 'px;' +
+               'padding-left:' + Math.max(14, side) + 'px;' +
+               'padding-right:' + Math.max(14, side) + 'px;}';
+        if (bbTextScale > 100) {
+            out += BB_CARD_SEL + '{padding:' + Math.max(12, Math.round(BB_CARD_PAD_V * shrink)) + 'px ' +
+                                               Math.max(14, Math.round(BB_CARD_PAD_H * shrink)) + 'px;}';
+        }
     }
     return out;
 }
@@ -3074,6 +3117,10 @@ function bbApplyTypography() {
     if (val) val.textContent = bbTextScale + '%';
     const range = document.getElementById('typo-scale-range');
     if (range && Number(range.value) !== bbTextScale) range.value = bbTextScale;
+    const wval = document.getElementById('typo-width-val');
+    if (wval) wval.textContent = bbContentWidth + '%';
+    const wrange = document.getElementById('typo-width-range');
+    if (wrange && Number(wrange.value) !== bbContentWidth) wrange.value = bbContentWidth;
     document.querySelectorAll('.typo-font').forEach(b => b.classList.toggle('on', b.dataset.font === bbFontId));
 }
 function bbSetTextScale(v) {
@@ -3083,12 +3130,19 @@ function bbSetTextScale(v) {
     bbApplyTypography();
 }
 function bbStepTextScale(d) { bbSetTextScale(bbTextScale + d); }
+function bbSetContentWidth(v) {
+    const n = Math.round(Number(v) / 10) * 10;
+    bbContentWidth = Math.max(BB_WIDTH_MIN, Math.min(BB_WIDTH_MAX, n || 100));
+    localStorage.setItem('bb_contentWidth', String(bbContentWidth));
+    bbApplyTypography();
+}
+function bbStepContentWidth(d) { bbSetContentWidth(bbContentWidth + d); }
 function bbSetFont(id) {
     bbFontId = id;
     localStorage.setItem('bb_fontFamily', id);
     bbApplyTypography();
 }
-function bbResetTypography() { bbSetTextScale(100); bbSetFont('default'); }
+function bbResetTypography() { bbSetTextScale(100); bbSetContentWidth(100); bbSetFont('default'); }
 
 function bbBuildFontChips() {
     const wrap = document.getElementById('typo-fonts');
