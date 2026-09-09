@@ -1078,7 +1078,7 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
    acting on: while a controller is live, the current question carries a
    ring and the navigator cell is already marked.
 ============================================================ */
-body.pad-live .question-card.pad-focus {
+body.pad-live:not(.pad-noring) .question-card.pad-focus {
     box-shadow: 0 0 0 2px var(--text-accent), 0 10px 30px rgba(0,0,0,0.25);
 }
 /* A short word when a controller turns up, so it is obvious it was seen. */
@@ -1131,6 +1131,11 @@ body.pad-live .question-card.pad-focus {
 .pad-live-read { font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.9rem;
     font-variant-numeric: tabular-nums; min-height: 1.2em; }
 .pad-live-read b { color: var(--text-accent); font-weight: 700; }
+/* The ring is a matter of taste, so it has a switch of its own. */
+.pad-check { display: flex; align-items: center; gap: 8px; margin-bottom: 0.9rem;
+    font-size: 0.74rem; color: var(--text-main); cursor: pointer; user-select: none; }
+.pad-check input { flex: none; margin: 0; width: 15px; height: 15px; cursor: pointer;
+    accent-color: var(--text-accent); }
 .pad-grid { display: grid; grid-template-columns: 1fr auto auto; gap: 7px 10px; align-items: center; }
 .pad-grid .pad-col { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--text-muted); font-weight: 700; padding-bottom: 2px; }
@@ -3325,6 +3330,7 @@ bbApplyTypography();
                 to buttons that do come through.
             </div>
             <div class="pad-live-read" id="pad-live-read">In D mode, press a button on the controller to see which one it is.</div>
+            <label class="pad-check"><input type="checkbox" id="pad-ring-box" onchange="padSetRing(this.checked)"><span>Highlight the question the controller is on</span></label>
             <div class="pad-grid" id="pad-grid"></div>
             <div class="pad-foot">
                 <button onclick="padResetControls()">Restore defaults</button>
@@ -3365,6 +3371,7 @@ bbApplyTypography();
 const PADK = {
     on:   'bb_padOn',        // shared across quizzes, like the theme
     kbd:  'bb_padKbd',
+    ring: 'bb_padRing',
     map:  'bb_padMap',
     keys: 'bb_padKeys'
 };
@@ -3410,6 +3417,17 @@ const PAD_PROFILE = 'switch';
 
 function padOn()  { const v = localStorage.getItem(PADK.on);  return v === null ? true : v === 'true'; }
 function padKbd() { return localStorage.getItem(PADK.kbd) === 'true'; }
+/* The ring around the current question - on unless it has been turned off. */
+function padRing() { const v = localStorage.getItem(PADK.ring); return v === null ? true : v === 'true'; }
+function padApplyRing() {
+    if (document.body) document.body.classList.toggle('pad-noring', !padRing());
+    const box = document.getElementById('pad-ring-box');
+    if (box) box.checked = padRing();
+}
+function padSetRing(on) {
+    try { localStorage.setItem(PADK.ring, on ? 'true' : 'false'); } catch (e) {}
+    padApplyRing();
+}
 function padProfile() { return PAD_PROFILE; }
 function padMap() {
     const stored = load(PADK.map, {});
@@ -3839,6 +3857,7 @@ document.addEventListener('click', function padFirstLook() {
     if (gp) { padConnected(gp); return; }
     padStart();
 });
+padApplyRing();
 if (padOn()) padStart();
 
 /* ------------------------------------------------------- keyboard mode */
@@ -3888,6 +3907,7 @@ function padSyncSettings() {
 /* --------------------------------------------------------- the panel */
 function padOpenControls() {
     padBuildPanel();
+    padApplyRing();
     document.getElementById('pad-overlay').classList.add('open');
     const p = document.getElementById('settings-panel'); if (p) p.classList.remove('open');
     const sb = document.getElementById('settings-btn'); if (sb) sb.classList.remove('open');
