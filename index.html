@@ -1081,6 +1081,9 @@ body.no-accents .hdr-track .ht-fill{background:var(--solid-accent)}
 body.pad-live:not(.pad-noring) .question-card.pad-focus {
     box-shadow: 0 0 0 2px var(--text-accent), 0 10px 30px rgba(0,0,0,0.25);
 }
+/* Pinned header follows the controller's group of rows rather than a
+   settings row, so the usual divider rule misses it - give it its line. */
+#pad-sub-rows + .settings-row { border-top: 1px solid var(--border-subtle); }
 /* A short word when a controller turns up, so it is obvious it was seen. */
 #pad-toast {
     position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(140%);
