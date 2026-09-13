@@ -1160,6 +1160,20 @@ body.pad-live:not(.pad-noring) .question-card.pad-focus {
     .pad-grid .pad-col.k, .pad-grid .pad-bind.key { grid-column: 2; }
 }
 </style>
+<style id="nav-sticky-style">
+/* The progress block stays at the top of the navigator while its questions
+   scroll beneath it. The sidebar's own top padding moves into the block, so it
+   sits flush against the top edge in every browser, and goes back onto the
+   sidebar whenever the block is hidden. The sidebar colour is see-through, so
+   the block is backed with the page colour: nothing shows through its text. */
+#sidebar { padding-top: 0; }
+#sidebar .nav-summary { position: sticky; top: 0; z-index: 3; padding-top: 1.2rem;
+    background: linear-gradient(var(--bg-sidebar), var(--bg-sidebar)), var(--bg-body); }
+body.tracker-header #sidebar, body.set-review #sidebar { padding-top: 1.2rem; }
+body #sidebar.collapsed { padding: 0; }
+/* a window too short to spare the room: it scrolls away, as before */
+@media (max-height: 520px) { #sidebar .nav-summary { position: static; } }
+</style>
 </head>
 
 <body>
@@ -1309,7 +1323,7 @@ body.pad-live:not(.pad-noring) .question-card.pad-focus {
         </div>
         <div id="pad-sub-rows">
             <div class="settings-row settings-subrow">
-                <div class="settings-text"><div class="settings-title">8BitDo keyboard mode</div><div class="settings-sub">For a pad on the <b>K</b> position, which pairs as a keyboard</div></div>
+                <div class="settings-text"><div class="settings-title">8BitDo keyboard mode</div><div class="settings-sub">For a controller in <b>K</b> mode, which pairs as a keyboard</div></div>
                 <button id="padkbd-toggle" class="toggle-switch" role="switch" aria-checked="false" onclick="togglePadKbd()"><span class="toggle-knob"></span></button>
             </div>
             <div class="settings-row settings-subrow">
@@ -3319,9 +3333,9 @@ bbApplyTypography();
                 <span class="pad-dot" aria-hidden="true"></span>
                 <span class="pad-status-text"></span>
             </div>
-            <p class="pad-hint">Put the mode switch on <b>D</b>, pair the controller if needed, and press any button.</p>
-            <p class="pad-hint"><b>K</b> mode works too if you toggle &ldquo;8BitDo keyboard mode&rdquo;. In K mode, the <b>Key</b> column is the one that matters, so adjust that as you prefer.</p>
-            <p class="pad-hint"><b>S</b> mode does not work on Windows within most internet browsers.</p>
+            <p class="pad-hint">Put the mode switch on <b>D</b> (or hold <b>B + Start</b> to turn on an 8BitDo Zero 2), pair the controller if needed, and press any button.</p>
+            <p class="pad-hint"><b>K</b> mode (<b>R + Start</b> on a Zero 2) works too if you toggle &ldquo;8BitDo keyboard mode&rdquo;. In K mode, the <b>Key</b> column is the one that matters, so adjust that as you prefer.</p>
+            <p class="pad-hint"><b>S</b> mode (<b>Y + Start</b> on a Zero 2) does not work on Windows within most internet browsers.</p>
             <div class="pad-nodpad" id="pad-nodpad" style="display:none">
                 This browser is handing over the pad <b>without its D-pad</b> &mdash; it is in no button
                 and on no axis, so nothing here can reach it. That is Switch mode: it is a console
@@ -4020,6 +4034,23 @@ function padToast(msg) {
 }
 
 padSyncSettings();
+</script>
+<script id="nav-sticky-script">
+/* Room at the top of the navigator for the pinned progress block, so a
+   question box scrolled into view - by tabbing through them, say - is never
+   left underneath it. */
+(function () {
+    var side = document.getElementById('sidebar');
+    var sum = side && side.querySelector('.nav-summary');
+    if (!side || !sum) return;
+    function fit() {
+        var pinned = sum.offsetHeight > 0 && getComputedStyle(sum).position === 'sticky';
+        side.style.scrollPaddingTop = pinned ? (sum.offsetHeight + 8) + 'px' : '';
+    }
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(sum);
+    window.addEventListener('resize', fit);
+    fit();
+})();
 </script>
 </body>
 </html>
